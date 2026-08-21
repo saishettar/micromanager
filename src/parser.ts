@@ -1,13 +1,15 @@
-import { createRequire } from 'node:module';
 import { parse } from '@babel/parser';
+import _traverse from '@babel/traverse';
 import type { NodePath, TraverseOptions } from '@babel/traverse';
 import type * as t from '@babel/types';
 
+type TraverseFn = (ast: t.Node, opts: TraverseOptions) => void;
+
 // @babel/traverse's CJS/ESM default-export shape isn't reliably typed under
-// NodeNext resolution, so bypass it with a real `require` for the runtime value.
-const require = createRequire(import.meta.url);
-const traverseModule = require('@babel/traverse');
-const traverse: (ast: t.Node, opts: TraverseOptions) => void = traverseModule.default ?? traverseModule;
+// NodeNext resolution (the static type ends up as an uncallable module
+// namespace), so resolve the real callable at runtime and give it its own
+// explicit type instead of trusting `typeof _traverse`.
+const traverse: TraverseFn = typeof _traverse === 'function' ? _traverse : (_traverse as any).default;
 
 export type IdentifierKind = 'var' | 'func' | 'param' | 'class';
 

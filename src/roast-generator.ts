@@ -7,8 +7,15 @@ export type Intensity = 'mild' | 'medium' | 'unhinged';
 
 type RoastBank = Record<string, Record<string, string[]>>;
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const bank: RoastBank = JSON.parse(readFileSync(path.join(__dirname, 'roasts.json'), 'utf-8'));
+// `declare` only — erased at compile time, so it creates no runtime binding.
+// A bundler that wraps this module as CommonJS (the VS Code extension build)
+// already provides a real `__dirname`; a plain `typeof` check is safe even
+// where no such binding exists at all (native ESM, which uses `import.meta.url`
+// instead — and which a CJS bundler empties out, so it can't be used unconditionally).
+declare const __dirname: string | undefined;
+
+const moduleDir = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const bank: RoastBank = JSON.parse(readFileSync(path.join(moduleDir, 'roasts.json'), 'utf-8'));
 
 function interpolate(template: string, match: RuleMatch): string {
   return template
