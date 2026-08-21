@@ -3,8 +3,9 @@
   "tasks": [
     {
       "label": "build:vscode",
-      "type": "npm",
-      "script": "build:vscode",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "build:vscode"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "silent"
