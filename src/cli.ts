@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Command } from 'commander';
@@ -10,6 +10,7 @@ import { loadConfig } from './config.js';
 import { formatReport, type ReportedMatch } from './reporter.js';
 import { generateRoast } from './roast-generator.js';
 import { injectRoasts, stripRoasts } from './injector.js';
+import { filterLintable, getStagedFiles } from './git.js';
 import type { RuleMatch } from './rules/types.js';
 
 export interface LintResult {
@@ -162,27 +163,119 @@ export function runClean(patterns: string[], cwd: string = process.cwd()): LintR
   return { output: lines.join('\n'), exitCode: 0 };
 }
 
+const HOOK_MARKER = '# --- micromanager pre-commit hook ---';
+
+export function installHook(cwd: string = process.cwd()): LintResult {
+  const gitDir = path.join(cwd, '.git');
+  if (!existsSync(gitDir)) {
+    return { output: 'No .git directory found here — run this from your repo root.', exitCode: 1 };
+  }
+
+  const hooksDir = path.join(gitDir, 'hooks');
+  mkdirSync(hooksDir, { recursive: true });
+  const hookPath = path.join(hooksDir, 'pre-commit');
+
+  const existing = existsSync(hookPath) ? readFileSync(hookPath, 'utf-8') : '';
+  if (existing.includes(HOOK_MARKER)) {
+    return { output: 'micromanager pre-commit hook is already installed.', exitCode: 0 };
+  }
+
+  const block = `${HOOK_MARKER}\nnpx micromanager --staged\n`;
+  const script = existing ? `${existing.trimEnd()}\n\n${block}` : `#!/bin/sh\n${block}`;
+
+  writeFileSync(hookPath, script, 'utf-8');
+  try {
+    chmodSync(hookPath, 0o755);
+  } catch {
+    // best-effort: some filesystems (e.g. certain Windows setups) don't support POSIX modes
+  }
+
+  return {
+    output: `Installed pre-commit hook at ${path.relative(cwd, hookPath)} — staged JS/TS files get roasted before every commit.`,
+    exitCode: 0,
+  };
+}
+
+export function uninstallHook(cwd: string = process.cwd()): LintResult {
+  const hookPath = path.join(cwd, '.git', 'hooks', 'pre-commit');
+  if (!existsSync(hookPath)) {
+    return { output: 'No pre-commit hook found.', exitCode: 0 };
+  }
+
+  const content = readFileSync(hookPath, 'utf-8');
+  if (!content.includes(HOOK_MARKER)) {
+    return { output: 'pre-commit hook exists but was not installed by micromanager — leaving it alone.', exitCode: 0 };
+  }
+
+  const withoutBlock = content
+    .replace(new RegExp(`\\n*${HOOK_MARKER}\\nnpx micromanager --staged\\n`), '')
+    .trimEnd();
+
+  const remainder = withoutBlock.replace(/^#!\/bin\/sh\s*$/m, '').trim();
+  if (remainder.length === 0) {
+    writeFileSync(hookPath, '', 'utf-8');
+  } else {
+    writeFileSync(hookPath, `${withoutBlock}\n`, 'utf-8');
+  }
+
+  return { output: 'Removed the micromanager pre-commit hook.', exitCode: 0 };
+}
+
 function main() {
   const program = new Command();
 
   program
     .name('micromanager')
     .description('A CLI linter that critiques your naming, not your logic.')
-    .argument('<patterns...>', 'file or glob patterns to lint')
+    .argument('[patterns...]', 'file or glob patterns to lint')
     .option('-w, --write', 'inject roasts as inline comments in the file instead of printing a report')
     .option('--clean', 'remove previously injected roast comments')
-    .action((patterns: string[], options: { write?: boolean; clean?: boolean }) => {
+    .option('--staged', 'lint only git-staged JS/TS files (used by the pre-commit hook)')
+    .action((patterns: string[], options: { write?: boolean; clean?: boolean; staged?: boolean }) => {
+      let effectivePatterns = patterns;
+
+      if (options.staged) {
+        effectivePatterns = filterLintable(getStagedFiles(process.cwd()));
+        if (effectivePatterns.length === 0) {
+          console.log('No staged JS/TS files to lint.');
+          process.exitCode = 0;
+          return;
+        }
+      } else if (patterns.length === 0) {
+        console.error('Error: provide file/glob patterns, or use --staged.');
+        process.exitCode = 1;
+        return;
+      }
+
       const { output, exitCode } = options.clean
-        ? runClean(patterns)
+        ? runClean(effectivePatterns)
         : options.write
-          ? runInject(patterns)
-          : runLint(patterns);
+          ? runInject(effectivePatterns)
+          : runLint(effectivePatterns);
 
       if (exitCode === 0) {
         console.log(output);
       } else {
         console.error(output);
       }
+      process.exitCode = exitCode;
+    });
+
+  program
+    .command('install-hook')
+    .description('install a git pre-commit hook that roasts staged files before every commit')
+    .action(() => {
+      const { output, exitCode } = installHook();
+      console.log(output);
+      process.exitCode = exitCode;
+    });
+
+  program
+    .command('uninstall-hook')
+    .description('remove the micromanager pre-commit hook')
+    .action(() => {
+      const { output, exitCode } = uninstallHook();
+      console.log(output);
       process.exitCode = exitCode;
     });
 

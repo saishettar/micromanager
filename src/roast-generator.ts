@@ -16,11 +16,29 @@ function interpolate(template: string, match: RuleMatch): string {
     .replace(/\{\{detail\}\}/g, match.detail ?? match.identifier.name);
 }
 
-export function generateRoast(match: RuleMatch, intensity: Intensity): string {
+// FNV-1a — good enough to distribute template picks evenly; not used for anything security-sensitive.
+function hashSeed(seed: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * Picks and interpolates a roast template for a match.
+ *
+ * Without a `seed`, the template is chosen at random each call (what the CLI
+ * wants, so repeated offenses in one run don't all print the same line).
+ * With a `seed`, the pick is deterministic (what an editor integration wants,
+ * so the same violation doesn't reroll its message on every relint).
+ */
+export function generateRoast(match: RuleMatch, intensity: Intensity, seed?: string): string {
   const templates = bank[match.ruleId]?.[intensity] ?? bank[match.ruleId]?.medium ?? [];
   if (templates.length === 0) {
     return `${match.identifier.name} — needs a better name.`;
   }
-  const template = templates[Math.floor(Math.random() * templates.length)];
-  return interpolate(template, match);
+  const index = seed ? hashSeed(seed) % templates.length : Math.floor(Math.random() * templates.length);
+  return interpolate(templates[index], match);
 }

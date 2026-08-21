@@ -19,6 +19,8 @@ export interface Identifier {
   scopeId: string;
   /** True when this identifier is the loop-variable of a for/for-in/for-of init. */
   isForLoopCounter?: boolean;
+  /** 1-indexed column the identifier's name ends at (exclusive); used to size editor diagnostics. */
+  endCol?: number;
 }
 
 function isForLoopCounter(path: NodePath<t.VariableDeclarator>): boolean {
@@ -52,6 +54,7 @@ export function parseFile(code: string, filename: string): Identifier[] {
       kind,
       line: id.loc.start.line,
       col: id.loc.start.column + 1,
+      endCol: id.loc.end.column + 1,
       scopeId,
       isForLoopCounter: loopCounter,
     });
