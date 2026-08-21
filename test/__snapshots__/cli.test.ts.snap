@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`cli integration > flags every rule against the fixture file and exits non-zero 1`] = `
+[
+  "test/fixtures/bad-names.ts:10:7  [copy-paste-smell]",
+  "test/fixtures/bad-names.ts:10:7  [inconsistent-casing]",
+  "test/fixtures/bad-names.ts:11:7  [copy-paste-smell]",
+  "test/fixtures/bad-names.ts:11:7  [inconsistent-casing]",
+  "test/fixtures/bad-names.ts:13:7  [generic-name]",
+  "test/fixtures/bad-names.ts:13:7  [single-letter]",
+  "test/fixtures/bad-names.ts:14:7  [generic-name]",
+  "test/fixtures/bad-names.ts:16:9  [inconsistent-casing]",
+  "test/fixtures/bad-names.ts:17:9  [inconsistent-casing]",
+  "test/fixtures/bad-names.ts:23:7  [single-letter]",
+  "test/fixtures/bad-names.ts:7:10  [inconsistent-casing]",
+  "test/fixtures/bad-names.ts:8:7  [generic-name]",
+  "test/fixtures/bad-names.ts:9:7  [numbered-variant]",
+]
+`;

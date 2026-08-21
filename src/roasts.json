@@ -1,0 +1,87 @@
+{
+  "generic-name": {
+    "mild": [
+      "\"{{name}}\" — a name so generic it could be anything. That's the problem.",
+      "\"{{name}}\" doesn't tell future-you much. Maybe give it a job title.",
+      "\"{{name}}\" works, technically. So does a shrug."
+    ],
+    "medium": [
+      "\"{{name}}\" — the naming equivalent of shrugging and walking away.",
+      "\"{{name}}\" tells me nothing except that you were in a hurry.",
+      "Calling it \"{{name}}\" is a decision. Not a good one, but a decision."
+    ],
+    "unhinged": [
+      "\"{{name}}\" — congratulations, you've named a variable the way toddlers name pets.",
+      "\"{{name}}\" is what you type when you've given up on being a professional.",
+      "Naming it \"{{name}}\" is a cry for help disguised as source code."
+    ]
+  },
+  "numbered-variant": {
+    "mild": [
+      "\"{{name}}\" — the sequel nobody asked for.",
+      "\"{{name}}\" implies there's a \"{{detail}}\" somewhere with an identity crisis.",
+      "\"{{name}}\" suggests a version history nobody wrote down."
+    ],
+    "medium": [
+      "\"{{name}}\" — when you couldn't be bothered to explain what changed.",
+      "\"{{name}}\" is what happens when \"{{detail}}\" already existed and you panicked.",
+      "\"{{name}}\" — bumping a number instead of naming the difference."
+    ],
+    "unhinged": [
+      "\"{{name}}\" — a monument to every time you typed \"{{detail}}\" and then gave up mid-thought.",
+      "\"{{name}}\" is what you name something when explaining it out loud would be too embarrassing.",
+      "\"{{name}}\" — Ctrl+C, Ctrl+V, increment, ship it. Legendary workflow."
+    ]
+  },
+  "single-letter": {
+    "mild": [
+      "\"{{name}}\" — one whole letter of effort.",
+      "\"{{name}}\" saved you three keystrokes and cost the next reader ten minutes.",
+      "\"{{name}}\" is efficient to type and impossible to search for."
+    ],
+    "medium": [
+      "\"{{name}}\" — bold of you to assume this scope only ever needs one idea.",
+      "\"{{name}}\" reads like a variable that's ashamed of its own purpose.",
+      "\"{{name}}\" — great, now go find every reference to it in six months."
+    ],
+    "unhinged": [
+      "\"{{name}}\" — you had the entire alphabet and infinite words and you chose this.",
+      "\"{{name}}\" is not a name, it's a hostage note.",
+      "\"{{name}}\" — the linter equivalent of mumbling and hoping no one asks a follow-up."
+    ]
+  },
+  "copy-paste-smell": {
+    "mild": [
+      "\"{{name}}\" — bold of you to assume this is final.",
+      "\"{{name}}\" implies there are siblings out there, all slightly different, all named worse.",
+      "\"{{name}}\" — one of several \"final\" answers, apparently."
+    ],
+    "medium": [
+      "\"{{name}}\" — the naming equivalent of \"final_final_v2_ACTUAL.docx\".",
+      "\"{{name}}\" suggests a decision was made, then unmade, then copy-pasted anyway.",
+      "\"{{name}}\" — nothing says confidence like a suffix qualifying your own suffix."
+    ],
+    "unhinged": [
+      "\"{{name}}\" — there is no \"final\" in software, only \"final\" you were too tired to rename.",
+      "\"{{name}}\" is what duplication looks like when it puts on a suit and calls itself a variable.",
+      "\"{{name}}\" — somewhere there's a \"{{name}}\" of this \"{{name}}\", and it's named worse."
+    ]
+  },
+  "inconsistent-casing": {
+    "mild": [
+      "\"{{name}}\" sits right next to \"{{detail}}\" like they've never met.",
+      "\"{{name}}\" and \"{{detail}}\" — pick a casing convention and stick with it.",
+      "\"{{name}}\" next to \"{{detail}}\" is giving mixed signals."
+    ],
+    "medium": [
+      "\"{{name}}\" next to \"{{detail}}\" — did two different people write this scope, or just one very indecisive one?",
+      "\"{{name}}\" and \"{{detail}}\" in the same scope is a style guide crying softly.",
+      "\"{{name}}\" clashing with \"{{detail}}\" suggests nobody's reading the linter output. Oh, wait."
+    ],
+    "unhinged": [
+      "\"{{name}}\" living next to \"{{detail}}\" is the coding equivalent of wearing socks with sandals.",
+      "\"{{name}}\" and \"{{detail}}\" in one scope — pick a personality and commit to it.",
+      "\"{{name}}\" vs \"{{detail}}\" — this file has main character syndrome and two conflicting protagonists."
+    ]
+  }
+}
